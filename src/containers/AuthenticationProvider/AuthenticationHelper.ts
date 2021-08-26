@@ -2,14 +2,14 @@ import { AccountInfo, PublicClientApplication, BrowserCacheLocation, Configurati
 
 const FLUSH_ACCESS_FROM_ALL_TABS = "FLUSH_ACCESS_FROM_ALL_TABS";
 const ResetFlowKey = "AADB2C90118";
-const scopes = ["scopes"];
+const scopes: string[] = []; // TO BE CHANGED WITH REAL SCOPES
 const msalConfiguration: Configuration = {
     auth: {
-        clientId: "clientId",
-        authority: "authority",
-        knownAuthorities: ["knownAuthorities"],
-        redirectUri: "redirectUri",
-        postLogoutRedirectUri: "postLogoutRedirectUri"
+        clientId: "clientId", // TO BE CHANGED WITH REAL CLIENT ID
+        authority: "authority", // TO BE CHANGED WITH REAL AUTHORITY
+        knownAuthorities: ["kwnonAuthority"], // TO BE CHANGED WITH REAL KNOWN AUTHORITIES
+        redirectUri: "http://localhost:3000/",
+        postLogoutRedirectUri: "http://localhost:3000/signout"
     },
     system: {
         loggerOptions: {
