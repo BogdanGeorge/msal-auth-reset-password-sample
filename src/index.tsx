@@ -1,17 +1,29 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { lazy, Suspense } from "react";
+import { Route, Router, Switch } from "react-router-dom";
+import { createBrowserHistory } from "history";
+import ReactDOM from "react-dom";
+import Application from "containers/Application/Application";
+import LoadingScreen from "components/LoadingScreen";
+
+import "./index.css";
+import { Routes } from "Routes";
+
+const IndexPrivate = lazy(() => import("./indexPrivate"));
+const IndexPublic = lazy(() => import("./indexPublic"));
+const browserHistory = createBrowserHistory();
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <Application>
+            <Suspense fallback={<LoadingScreen />}>
+                <Router history={browserHistory}>
+                    <Switch>
+                        <Route path={[Routes.ResetPassword, Routes.SignOut]} component={IndexPublic} />
+                        <Route path="*" component={IndexPrivate} />
+                    </Switch>
+                </Router>
+            </Suspense>
+        </Application>
+    </React.StrictMode>,
+    document.getElementById("root")
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
