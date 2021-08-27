@@ -1,4 +1,13 @@
-import { AccountInfo, PublicClientApplication, BrowserCacheLocation, Configuration, AuthenticationResult, LogLevel } from "@azure/msal-browser";
+import {
+    AccountInfo,
+    PublicClientApplication,
+    BrowserCacheLocation,
+    Configuration,
+    AuthenticationResult,
+    LogLevel,
+    EventType
+} from "@azure/msal-browser";
+import { Routes } from "Routes";
 
 const FLUSH_ACCESS_FROM_ALL_TABS = "FLUSH_ACCESS_FROM_ALL_TABS";
 const ResetFlowKey = "AADB2C90118";
@@ -35,7 +44,23 @@ const msalConfiguration: Configuration = {
     }
 };
 
-var msalInstance: PublicClientApplication | null = null;
+console.log("initializing msal instance");
+var msalInstance: PublicClientApplication = new PublicClientApplication(msalConfiguration);
+msalInstance.addEventCallback((event) => {
+    if (event.eventType === EventType.LOGIN_FAILURE && event.error?.message.includes(ResetFlowKey)) {
+        console.log("EventCallback redirecting");
+        window.location.href = Routes.ResetPassword;
+    }
+});
+window.addEventListener(
+    "storage",
+    async (event: StorageEvent) => {
+        if (event.key === FLUSH_ACCESS_FROM_ALL_TABS) {
+            await logout(false);
+        }
+    },
+    false
+);
 
 export async function getAuthResponse(): Promise<AuthenticationResult | null> {
     try {
@@ -84,21 +109,6 @@ export async function logout(flushAccessFromAllTabs: boolean = true) {
         window.localStorage.removeItem(FLUSH_ACCESS_FROM_ALL_TABS);
     }
     await msalInstance?.logout();
-}
-
-export function initializeMsalInstance(): PublicClientApplication {
-    msalInstance = new PublicClientApplication(msalConfiguration);
-    window.addEventListener(
-        "storage",
-        async (event: StorageEvent) => {
-            if (event.key === FLUSH_ACCESS_FROM_ALL_TABS) {
-                await logout(false);
-            }
-        },
-        false
-    );
-
-    return msalInstance;
 }
 
 export { msalInstance, scopes, ResetFlowKey };
